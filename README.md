@@ -9,7 +9,7 @@ This small library aims to solve that problem.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'templater'
+gem 'templater', git: 'git@github.com:Rambatino/templater.git', tag: 'v0.0.1'
 ```
 
 And then execute:
