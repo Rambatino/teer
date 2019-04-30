@@ -3,3 +3,4 @@ names:
   worst_value: "names.sort[-1].value"
   text:
     GB_en: "{{ worst_name }} has the least apples, having only {{ worst_value }}"
+    FR: "{{ worst_name }} a le moins de pommes, n'en ayant que {{ worst_value }}"

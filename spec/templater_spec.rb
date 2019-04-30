@@ -39,6 +39,8 @@ RSpec.describe Templater do
     end
 
     it 'can handle another language, such as French' do
+      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
+      expect(templater.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
     end
   end
 
