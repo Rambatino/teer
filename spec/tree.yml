@@ -11,6 +11,6 @@ answers && node_ids && questions:
     is_max ? 'best' : 'worst'
   text:
     GB_en: |-
-      Your CHAID performed {{ best_or_worst }} for respondents who selected: {{ multi_params }}
+      Behaviour change was {{ best_or_worst }} for respondents who selected: {{ multi_params }}
 
       for `{{ NAME }}`

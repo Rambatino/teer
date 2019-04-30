@@ -1,0 +1,14 @@
+names:
+  best_name: names.max.key
+  best_value: names.max.value
+  text:
+    GB_en: "{{ best_name }} has the most apples."
+
+  second_best_value: "names.sort.second.value"
+  best_value > second_best_value + 5:
+    second_best_name: names.sort.second.key
+    text:
+      GB_en: "It's a lot more than {{ second_best_name }} who came in second place."
+  not (best_value > second_best_value + 5):
+    text:
+      GB_en: "However, {{ second_best_name }}'s {{ second_best_value }} was close behind."

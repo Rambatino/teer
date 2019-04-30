@@ -26,6 +26,11 @@ RSpec.describe Templater do
       expect(templater.finding).to eq('Jeff has the least apples, having only 2')
     end
 
+    it 'can handle more complex yaml' do
+      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(templater.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
+    end
+
     it 'can pass other parameters through' do
       template = {
         'best_name' => 'names.sort[0].key',
@@ -41,6 +46,11 @@ RSpec.describe Templater do
     it 'can handle another language, such as French' do
       templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
       expect(templater.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
+    end
+
+    it 'allows conditionals' do
+      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(templater.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
   end
 
@@ -63,7 +73,7 @@ RSpec.describe Templater do
         File.join(File.dirname(__FILE__), './tree.yml'),
         'NAME' => 'Would you change your response to Apple?'
       )
-      expect(templater.finding).to eq("Your CHAID performed worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
+      expect(templater.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
     end
   end
 end
