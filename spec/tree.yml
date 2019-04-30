@@ -1,0 +1,16 @@
+answers && node_ids && questions:
+  chosen_score: "answers.sort[is_max ? 0 : -1].value"
+  chosen_answers: answers.eql(chosen_score)
+  chosen_questions: questions.eql(chosen_score)
+  multi_params: >-
+    chosen_questions.uniq.data.map do |q, i|
+      matched = chosen_answers.slice_from(chosen_questions, q)
+      interpolate.call("\n* `#{matched.keys}` for `#{q}`")
+    end.flatten.join
+  best_or_worst: >-
+    is_max ? 'best' : 'worst'
+  text:
+    GB_en: |-
+      Your CHAID performed {{ best_or_worst }} for respondents who selected: {{ multi_params }}
+
+      for `{{ NAME }}`

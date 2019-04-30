@@ -4,3 +4,9 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
 # Specify your gem's dependencies in templater.gemspec
 gemspec
+gem 'handlebars'
+gem 'activesupport'
+
+group :test do
+  gem 'pry'
+end

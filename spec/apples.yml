@@ -1,0 +1,5 @@
+names:
+  worst_name: "names.sort[-1].key"
+  worst_value: "names.sort[-1].value"
+  text:
+    GB_en: "{{ worst_name }} has the least apples, having only {{ worst_value }}"
