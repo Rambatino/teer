@@ -143,7 +143,7 @@ Templater::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
-], 'count', template, {}, :FR).findings.join("\n")
+], 'count', template).findings.join("\n")
 
 => "Alan has the most apples.\nIt's a lot more than Bob who came in second place."
 ```
