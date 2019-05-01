@@ -121,6 +121,18 @@ With this template, the results concatenate (in a top down fashion) and it resul
 => "Alan has the most apples. It's a lot more than Bob who came in second place."
 ```
 
+You can also collect them all separately (using the method `findings`) so as to join them anyway you like:
+
+```ruby
+Templater::Template.create([
+  { 'name' => 'Bob', 'count' => 4 },
+  { 'name' => 'Alan', 'count' => 14 },
+  { 'name' => 'Jeff', 'count' => 2 }
+], 'count', template, {}, :FR).findings.join("\n")
+
+=> "Alan has the most apples.\nIt's a lot more than Bob who came in second place."
+```
+
 #### Passing in extra Variables
 
 ```ruby
@@ -128,7 +140,7 @@ templater = Templater::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
-], 'count', template, {some_other_var: 'my special variable'}).finding
+], 'count', template, {'some_other_var' => 'my special variable'}).finding
 ```
 
 `{{ some_other_var }}` will yield 'my special variable' when placed inside the template
@@ -143,6 +155,40 @@ Behaviour change was worst for respondents who selected:
 - `Female` for `gender`
 
 for `Would you change your response to Apple?`
+
+#### Helpers | Formatters
+
+To format variables as the template is interpolated, helpers are used to do things such as round numbers of format time. They take the form of `{{METHOD VARIABLE}}`
+
+Examples below:
+
+``` ruby
+horrible_floats_and_time = [
+  { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Bob', 'count' => 4.213432 },
+  { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Alan', 'count' => 14.35 },
+  { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Jeff', 'count' => 2.1 }
+]
+
+text = '{{round best_value }}'
+template = { 'best_value' => 'names.sort[0].value', 'text' => { 'GB_en' => text } }
+Templater::Template.create(horrible_floats_and_time, 'count', template).finding
+=> "14.4"
+
+text = '{{month month_key }}'
+template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => text } }
+Templater::Template.create(horrible_floats_and_time, 'count', template).finding
+=> "February"
+```
+
+Although only those two currently come out of the box, it's easy to add more when your app initialises:
+
+``` ruby
+Templater::Template.handlebars.register_helper(:year) do |_context, condition, _block|
+  Time.at(condition).strftime('%Y')
+end
+```
+
+See [here](https://github.com/cowboyd/handlebars.rb) for more advanced usage. If you feel the helper will benefit all, please submit a PR!
 
 ## Development
 

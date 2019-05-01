@@ -52,6 +52,22 @@ RSpec.describe Templater do
       templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
       expect(templater.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
+
+    it 'can collect all statements' do
+      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(templater.findings).to eq(['Alan has the most apples.', "It's a lot more than Bob who came in second place."])
+    end
+
+    it 'can slice a specific person' do
+      template = {
+        'count' => 'names.slice("Bob")[0].value',
+        'text' => {
+          'GB_en' => 'Bob has {{ count }} apples!'
+        }
+      }
+      templater = Templater::Template.create(apples, 'count', template, 'cat' => 'meow')
+      expect(templater.finding).to eq('Bob has 4 apples!')
+    end
   end
 
   context 'it can handle more complex examples' do
@@ -74,6 +90,44 @@ RSpec.describe Templater do
         'NAME' => 'Would you change your response to Apple?'
       )
       expect(templater.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
+    end
+  end
+
+  context 'helpers' do
+    let(:horrible_floats_and_time) do
+      [
+        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Bob', 'count' => 4.213432 },
+        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Alan', 'count' => 14.35 },
+        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Jeff', 'count' => 2.1 }
+      ]
+    end
+
+    it 'can use default handler :round' do
+      template = { 'best_value' => 'names.sort[0].value', 'text' => { 'GB_en' => '{{round best_value }}' } }
+      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
+      expect(templater.finding).to eq('14.4')
+    end
+
+    it 'can use default handler :month' do
+      template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{month month_key }}' } }
+      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
+      expect(templater.finding).to eq('February')
+    end
+
+    it 'raises ledgeable error when helper does not exist' do
+      template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
+      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
+      expect { templater.finding }.to raise_error(/Missing helper: "year"/)
+    end
+
+    it 'can have extra handlers added' do
+      Templater::Template.handlebars.register_helper(:year) do |_context, condition, _block|
+        Time.at(condition).strftime('%Y')
+      end
+
+      template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
+      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
+      expect(templater.finding).to eq('1993')
     end
   end
 end
