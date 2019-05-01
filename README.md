@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/Rambatino/templater.svg?branch=master)](https://travis-ci.com/Rambatino/templater)
 # Templater
 
 Picture the scene. You have a lot of data and you want to present the results of that data on a chart or a web page. How would you go about turning variable data into a human readable format - let's say you wanted to summarise a chart?
