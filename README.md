@@ -75,9 +75,24 @@ We can inspect the `names` variable, as it elucidates how these methods interact
 ```ruby
 templater.data.names # templater is defined above
 => <DataStore:0x007f83bd3e1398 @data=[["Bob", 4], ["Alan", 14], ["Jeff", 2]], @locale=:GB_en>
+# it's useful to try methods here before adding them to the template:
+templater.data.names.keys
+=> <Templater::VectorStore:0x00007fbaa7373200 @data=["Bob", "Alan", "Jeff"], @locale=:GB_en>
+
+templater.data.names.values
+=> <Templater::VectorStore:0x00007fbaa739a378 @data=[4, 14, 2], @locale=:GB_en>
+
+templater.data.names.max.key
+=> "Alan"
+
+templater.data.names.min.value
+=> 2
+
+templater.data.names.slice("Jeff")
+=> <Templater::DataStore:0x00007fbaa8a02188 @data=[["Jeff", 2]], @locale=:GB_en>
 ```
 
-Here each index row is associated with the value of the data and methods can be applied to that (defined in `lib/templater/data_store.rb`) such as `min`, `count`, `[]`, `sort` and also conditionals (such as `gt`, `lt`, `ne`, `eq`) which are able rich verbatims to be created from the underlying data.
+Here each index row is associated with the value of the data and methods can be applied to that (defined in `lib/templater/data_store.rb`) such as `min`, `count`, `[]`, `sort` and also conditionals (such as `gt`, `lt`, `ne`, `eq`) which are able to create rich verbatims from the underlying data.
 
 #### Multiple Language Support
 

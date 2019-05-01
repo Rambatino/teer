@@ -18,6 +18,7 @@ RSpec.describe Templater do
         }
       }
       templater = Templater::Template.create(apples, 'count', template)
+      binding.pry
       expect(templater.finding).to eq('Alan collected 14 apples, higher than anyone else!')
     end
 
