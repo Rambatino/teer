@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/Rambatino/templater.svg?branch=master)](https://travis-ci.com/Rambatino/templater)
+
 # Templater
 
 Picture the scene. You have a lot of data and you want to present the results of that data on a chart or a web page. How would you go about turning variable data into a human readable format - let's say you wanted to summarise a chart?
@@ -161,14 +162,26 @@ templater = Templater::Template.create([
 
 `{{ some_other_var }}` will yield 'my special variable' when placed inside the template
 
-#### A more complex example
+#### A more complex example - linking between rows
 
-See `templater_spec.rb`. Markdown can be written, returning a result such as:
+Note: This library is not turing complete, which means it's not for programming inside
+of the template. For instance, filtering the indexes less than or greater than a value is
+not appropriate to do inside of the template - you can filter the data before passing it in, using
+your favourite library.
+
+Having said that, there is a helper method, which translates as "only select the rows from this index
+that match these other index keys":
+
+```ruby
+kpis.slice_from(names, 'Bob') # translates as select only Bob's KPIs
+```
+
+Also see `templater_spec.rb`. Markdown can be written, returning a result such as:
 
 Behaviour change was worst for respondents who selected:
 
-- `West` for `regUS`
-- `Female` for `gender`
+-   `West` for `regUS`
+-   `Female` for `gender`
 
 for `Would you change your response to Apple?`
 
@@ -178,7 +191,7 @@ To format variables as the template is interpolated, helpers are used to do thin
 
 Examples below:
 
-``` ruby
+```ruby
 horrible_floats_and_time = [
   { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Bob', 'count' => 4.213432 },
   { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Alan', 'count' => 14.35 },
@@ -198,7 +211,7 @@ Templater::Template.create(horrible_floats_and_time, 'count', template).finding
 
 Although only those two currently come out of the box, it's easy to add more when your app initialises:
 
-``` ruby
+```ruby
 Templater::Template.handlebars.register_helper(:year) do |_context, condition, _block|
   Time.at(condition).strftime('%Y')
 end
@@ -214,7 +227,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/Rambatino/templater. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at <https://github.com/Rambatino/templater>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
