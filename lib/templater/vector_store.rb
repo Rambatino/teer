@@ -18,11 +18,11 @@ module Templater
     end
 
     def sum
-      @data.sum
+      @data.reduce(:+)
     end
 
     def mean
-      @data.sum / @data.count
+      @data.reduce(:+) / @data.count
     end
 
     def to_s
