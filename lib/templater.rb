@@ -7,19 +7,27 @@ module Templater
   class Error < StandardError; end
 
   class Template
-    def self.create(data, name, rules_path_or_hsh, kwargs = {}, locale = :GB_en)
+    def self.create(data, names, rules_path_or_obj, kwargs = {}, locale = :GB_en)
       return OpenStruct.new(data: nil, finding: nil) if data.empty?
       register_helpers
-      @template = Engine.new(data, name, template(rules_path_or_hsh), handlebars, locale, kwargs)
+      @template = Engine.new(data, names, template(rules_path_or_obj, locale), handlebars, locale, kwargs)
     end
 
     def pre_parsed_finding
       @template.pre_parsed_finding
     end
 
-    def self.template(rules_path_or_hsh)
-      return rules_path_or_hsh if rules_path_or_hsh.is_a?(Hash)
-      YAML.safe_load(File.read(rules_path_or_hsh))
+    def self.template(rules_path_or_obj, locale)
+      case rules_path_or_obj
+      when String
+        YAML.safe_load(File.read(rules_path_or_obj))
+      when Array
+        rules_path_or_obj.map { |condition, text| [condition, { 'text' => { locale.to_s => text } } ] }.to_h
+      when Hash
+        return rules_path_or_obj
+      else
+        raise ArgumentError, "Unknown template structure: #{rules_path_or_obj.class}"
+      end
     end
 
     def self.handlebars

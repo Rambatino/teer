@@ -70,6 +70,29 @@ RSpec.describe Templater do
     end
   end
 
+  context 'when passing spreadsheet of rules' do
+    let(:apples) do
+      [
+        { 'name' => 'Bob', 'green_apples' => 4, 'red_apples' => 6 },
+        { 'name' => 'Alan', 'green_apples' => 14, 'red_apples' => 10 },
+        { 'name' => 'Jeff', 'green_apples' => 2, 'red_apples' => 15 }
+      ]
+    end
+
+    it 'can parse 2d array templates of condition:text' do
+      template = [
+        ['green_apples.mean < 5', 'Few green apples have been found'],
+        ['green_apples.mean > 4 && green_apples.mean < 10', 'A decent amount of green apples have been found'],
+        ['green_apples.mean > 10', 'Lots of green apples have been found'],
+        ['red_apples.mean < 5', 'Few red apples have been found'],
+        ['red_apples.mean > 4 && red_apples.mean < 10', 'A decent amount of red apples have been found'],
+        ['red_apples.mean > 9', 'Lots of red apples have been found'],
+      ]
+      templater = Templater::Template.create(apples, ['green_apples', 'red_apples'], template)
+      expect(templater.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found'])
+    end
+  end
+
   context 'it can handle more complex examples' do
     it 'can output bullet points and link between indexes' do
       tree_data = [

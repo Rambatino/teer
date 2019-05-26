@@ -1,18 +1,29 @@
 require 'active_support/inflector'
 require 'templater/data_store'
+require 'templater/vector_store'
 require 'ostruct'
 
 module Templater
   class Engine
-    def initialize(data, name, template, handlebars, locale, kwargs)
+    def initialize(data, names, template, handlebars, locale, kwargs)
       @template = template
       @handlebars = handlebars
       @locale = locale
       @findings = []
-      @store = OpenStruct.new((data[0].keys - [name]).map { |idx| [idx.pluralize, DataStore.new(data.map { |r| [r[idx], r[name]] }, @locale)] }.to_h)
+      setup_store(data, names)
       @data_store = @store.clone
       kwargs.each { |k, v| @store[k] = v }
       @store.interpolate = interpolate
+    end
+
+    def setup_store(data, names)
+      n_arr = Array(names)
+      @store = OpenStruct.new((data[0].keys - n_arr).map do |idx|
+        [idx.pluralize, DataStore.new(data.map { |r| [r[idx], r[n_arr[0]]] }, @locale)]
+      end.to_h)
+      n_arr.each do |name|
+        @store[name.pluralize] = VectorStore.new(data.map { |r| r[name] }, @locale)
+      end
     end
 
     def finding

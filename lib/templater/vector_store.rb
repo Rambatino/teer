@@ -17,6 +17,14 @@ module Templater
       @data.count
     end
 
+    def sum
+      @data.sum
+    end
+
+    def mean
+      @data.sum / @data.count
+    end
+
     def to_s
       length = @data.length
       case length
@@ -27,7 +35,7 @@ module Templater
       else
         sentence = @data.join(', ')
         # should support all languages at some point
-        sentence.reverse.sub(' ,', ' dna ').reverse 
+        sentence.reverse.sub(' ,', ' dna ').reverse
       end
     end
 
