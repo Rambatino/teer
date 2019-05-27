@@ -7,6 +7,14 @@ module Templater
       @locale = locale
     end
 
+    def key
+      @data.transpose[0][0]
+    end
+
+    def value
+      @data.transpose[1][0]
+    end
+
     def keys
       VectorStore.new(@data.transpose[0], @locale)
     end
@@ -35,8 +43,8 @@ module Templater
       VectorStore.new(@data.min_by(&:last), @locale)
     end
 
-    def [](key)
-      VectorStore.new(@data[key], @locale)
+    def [](i)
+      VectorStore.new(@data[i], @locale)
     end
 
     def sort

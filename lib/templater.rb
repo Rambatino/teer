@@ -10,6 +10,8 @@ module Templater
     def self.create(data, names, rules_path_or_obj, kwargs = {}, locale = :GB_en)
       return OpenStruct.new(data: nil, finding: nil) if data.empty?
       register_helpers
+      data_keys = data.first.keys
+      raise ArgumentError, "#{names} not present in data" if (Array(names) - data_keys).count != 0
       @template = Engine.new(data, names, template(rules_path_or_obj, locale), handlebars, locale, kwargs)
     end
 
