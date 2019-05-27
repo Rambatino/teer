@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Templater do
   it 'has a version number' do
     expect(Templater::VERSION).not_to be nil
@@ -70,6 +72,46 @@ RSpec.describe Templater do
     end
   end
 
+  context 'when passing spreadsheet of rules' do
+    let(:apples) do
+      [
+        { 'name' => 'Bob', 'green_apple_count' => 4, 'red_apple_count' => 6 },
+        { 'name' => 'Alan', 'green_apple_count' => 14, 'red_apple_count' => 10 },
+        { 'name' => 'Jeff', 'green_apple_count' => 2, 'red_apple_count' => 15 }
+      ]
+    end
+
+    it 'can parse 2d array templates of condition:text' do
+      template = [
+        ['green_apple_counts.mean < 5', 'Few green apples have been found'],
+        ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found'],
+        ['green_apple_counts.mean > 10', 'Lots of green apples have been found'],
+        ['red_apple_counts.mean < 5', 'Few red apples have been found'],
+        ['red_apple_counts.mean > 4 && red_apple_counts.mean < 10', 'A decent amount of red apples have been found'],
+        ['red_apple_counts.mean > 9', 'Lots of red apples have been found'],
+        ['red_apple_count.names.slice("Bob").value > 5', 'Bob has made his quota']
+      ]
+      templater = Templater::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect(templater.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found', 'Bob has made his quota'])
+    end
+
+    let(:apples_bad_name) do
+      [
+        { 'name' => 'Bob', 'green_apples' => 4, 'red_apples' => 6 },
+        { 'name' => 'Alan', 'green_apples' => 14, 'red_apples' => 10 },
+        { 'name' => 'Jeff', 'green_apples' => 2, 'red_apples' => 15 }
+      ]
+    end
+
+    it 'raises error if column name is plural' do
+      expect { Templater::Template.create(apples, %w[green_apples red_apples], [[]]) }.to raise_error
+    end
+
+    it 'columns do not exist' do
+      expect { Templater::Template.create(apples, %w[green_apple red_apple_count], [[]]) }.to raise_error
+    end
+  end
+
   context 'it can handle more complex examples' do
     it 'can output bullet points and link between indexes' do
       tree_data = [
@@ -96,9 +138,9 @@ RSpec.describe Templater do
   context 'helpers' do
     let(:horrible_floats_and_time) do
       [
-        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Bob', 'count' => 4.213432 },
-        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Alan', 'count' => 14.35 },
-        { 'time' => Time.new(1993, 02, 24, 12, 0, 0, "+09:00"), 'name' => 'Jeff', 'count' => 2.1 }
+        { 'time' => Time.new(1993, 0o2, 24, 12, 0, 0, '+09:00'), 'name' => 'Bob', 'count' => 4.213432 },
+        { 'time' => Time.new(1993, 0o2, 24, 12, 0, 0, '+09:00'), 'name' => 'Alan', 'count' => 14.35 },
+        { 'time' => Time.new(1993, 0o2, 24, 12, 0, 0, '+09:00'), 'name' => 'Jeff', 'count' => 2.1 }
       ]
     end
 

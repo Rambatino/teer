@@ -11,7 +11,7 @@ This small library aims to solve that problem.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'templater', git: 'git@github.com:Rambatino/templater.git', tag: 'v0.0.3'
+gem 'templater'
 ```
 
 And then execute:
@@ -71,6 +71,8 @@ As the templater parses the data, it takes a mandatory argument "name", in this 
 The template passed in has a first key (`names`) which checks for the presence of that variable (it's actually optional to do that check).
 
 Variables can also be defined in the template itself, and substituted into the output text. In the example above, `worst_name` is defined as variable, defined by: `names.sort[-1].key` which means take each row, and sort (ascending is false) the `names` by `count` and take the last row and the `key` is the row member of name and the `value` is the `count` associated with that name.
+
+As well as this, as count is a column, it can be accessed like `counts` and simple arithmetic operations can be applied to it, such as `counts.mean` or `counts.sum` to get the required value _if filtering is not required_. If filtering _is required_ then the correct approach is to filter using the indexes.
 
 We can inspect the `names` variable, as it elucidates how these methods interact with it:
 
@@ -184,6 +186,48 @@ Behaviour change was worst for respondents who selected:
 -   `Female` for `gender`
 
 for `Would you change your response to Apple?`
+
+### Importing Google Sheets rules into Templater
+
+Our use-case internally was to pull in 'rules' from Google Sheets and alongside the data, display key findings. Using this library you can easily achieve this. Let's say you have wide data with many columns and you don't care about the indexes:
+
+|            | banana | apple | pear  | orange |
+|------------|--------|-------|-------|--------|
+| person_id |        |       |       |        |
+| a          | 0.3    | 0.5   | 1     | 0.45   |
+| b          | 0.5    | 0.1   | 2     | 0.1    |
+| c          | 0.8    | 0.7   | 5     | 0.6    |
+| d          | 0.9    | 0.7   | 9     | 10     |
+
+``` ruby
+data = [
+  {'person_id' => 'a', 'banana' => 0.3, 'apple' => 0.5, 'pear' => 1, 'orange' => 0.45},
+  {'person_id' => 'b', 'banana' => 0.5, 'apple' => 0.1, 'pear' => 2, 'orange' => 0.1},
+  {'person_id' => 'c', 'banana' => 0.8, 'apple' => 0.7, 'pear' => 5, 'orange' => 0.6},
+  {'person_id' => 'd', 'banana' => 0.9, 'apple' => 0.7, 'pear' => 9, 'orange' => 10}
+]
+```
+
+Google Sheets rules in 2d array format [[condition, text], ...]:
+
+
+``` ruby
+rules = [
+  ['bananas.mean > 2', 'Lots of bananas'],
+  ['bananas.mean > 1 && bananas.mean < 2', 'Not that many bananas'],
+  ['bananas.mean < 1', 'No bananas'],
+  .
+  .
+  .
+]
+```
+* N.B. because there are multiple columns, the variables are accessed as the column name with an `s` on the end (plural columns will return an error) and to access the index data now, you have to access it by the column name e.g. `banana.person_ids.slice("a").value # = 0.3`
+
+The results of which can be calculated by doing
+``` ruby
+template = Templater.new(data, data.first.keys - ['person_id'], rules)
+template.findings # = ['No bananas'...]
+```
 
 #### Helpers | Formatters
 
