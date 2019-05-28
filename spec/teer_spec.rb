@@ -172,4 +172,22 @@ RSpec.describe Teer do
       expect(teer.finding).to eq('1993')
     end
   end
+
+  context '#bug_fixes' do
+    let(:apples) do
+      [
+        { 'name' => 'Bob', 'green_apple_count' => 4, 'red_apple_count' => 6 },
+        { 'name' => 'Alan', 'green_apple_count' => 14, 'red_apple_count' => 10 },
+        { 'name' => 'Jeff', 'green_apple_count' => 2, 'red_apple_count' => 15 }
+      ]
+    end
+
+    it 'handles functions within handlebars' do
+      template = [
+        ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
+      ]
+      teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variables in string: 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'")
+    end
+  end
 end

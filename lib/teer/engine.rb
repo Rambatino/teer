@@ -29,6 +29,7 @@ module Teer
           idxs = (data[0].keys - n_arr)
           names.each do |name|
             raise ArgumentError, "column name cannot be plural: #{name}" if name == name.pluralize
+
             struct[name] = OpenStruct.new(idxs.map do |idx|
               [idx.pluralize, DataStore.new(data.map { |r| [r[idx], r[name]] }, @locale)]
             end.to_h)
@@ -64,7 +65,13 @@ module Teer
     end
 
     def interpolate
-      @interpolate ||= proc { |string| @handlebars.compile(string).call(@store.to_h) }
+      @interpolate ||= proc { |string|
+        begin
+           @handlebars.compile(string).call(@store.to_h)
+        rescue StandardError
+          raise ArgumentError, "Could not parse variables in string: '#{string}'"
+        end
+      }
     end
 
     def add_to_store(template)
