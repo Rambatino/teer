@@ -1,5 +1,5 @@
 require 'bundler/setup'
-require 'templater'
+require 'template_engine'
 require 'pry'
 
 RSpec.configure do |config|

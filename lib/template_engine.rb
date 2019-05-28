@@ -1,9 +1,9 @@
-require 'templater/version'
-require 'templater/engine'
+require 'template_engine/version'
+require 'template_engine/engine'
 require 'handlebars'
 require 'yaml'
 
-module Templater
+module TemplateEngine
   class Error < StandardError; end
 
   class Template

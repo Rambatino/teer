@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/Rambatino/templater.svg?branch=master)](https://travis-ci.com/Rambatino/templater)
+[![Build Status](https://travis-ci.com/Rambatino/template_engine.svg?branch=master)](https://travis-ci.com/Rambatino/template_engine)
 
-# Templater
+# TemplateEngine
 
 Picture the scene. You have a lot of data and you want to present the results of that data on a chart or a web page. How would you go about turning variable data into a human readable format - let's say you wanted to summarise a chart?
 
@@ -11,7 +11,7 @@ This small library aims to solve that problem.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'templater'
+gem 'template_engine'
 ```
 
 And then execute:
@@ -20,7 +20,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install templater
+    $ gem install template_engine
 
 ## Usage
 
@@ -51,7 +51,7 @@ names: # only run if names is a variable in the template scope
 and by running:
 
 ```ruby
-templater = Templater::Template.create([
+template_engine = TemplateEngine::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
@@ -66,7 +66,7 @@ It parses the template and substitutes the values into the text:
 
 #### Key Principles to the example
 
-As the templater parses the data, it takes a mandatory argument "name", in this case `count` which is what the data is indexed against. The templater takes each index (there could be many) and defines new variables by pluralising the index. In this example, `names` becomes a variable (as it's one of the indexes) that we can apply methods to.
+As the template_engine parses the data, it takes a mandatory argument "name", in this case `count` which is what the data is indexed against. The template_engine takes each index (there could be many) and defines new variables by pluralising the index. In this example, `names` becomes a variable (as it's one of the indexes) that we can apply methods to.
 
 The template passed in has a first key (`names`) which checks for the presence of that variable (it's actually optional to do that check).
 
@@ -77,33 +77,33 @@ As well as this, as count is a column, it can be accessed like `counts` and simp
 We can inspect the `names` variable, as it elucidates how these methods interact with it:
 
 ```ruby
-templater.data.names # templater is defined above
+template_engine.data.names # template_engine is defined above
 => <DataStore:0x007f83bd3e1398 @data=[["Bob", 4], ["Alan", 14], ["Jeff", 2]], @locale=:GB_en>
 # it's useful to try methods here before adding them to the template:
-templater.data.names.keys
-=> <Templater::VectorStore:0x00007fbaa7373200 @data=["Bob", "Alan", "Jeff"], @locale=:GB_en>
+template_engine.data.names.keys
+=> <TemplateEngine::VectorStore:0x00007fbaa7373200 @data=["Bob", "Alan", "Jeff"], @locale=:GB_en>
 
-templater.data.names.values
-=> <Templater::VectorStore:0x00007fbaa739a378 @data=[4, 14, 2], @locale=:GB_en>
+template_engine.data.names.values
+=> <TemplateEngine::VectorStore:0x00007fbaa739a378 @data=[4, 14, 2], @locale=:GB_en>
 
-templater.data.names.max.key
+template_engine.data.names.max.key
 => "Alan"
 
-templater.data.names.min.value
+template_engine.data.names.min.value
 => 2
 
-templater.data.names.slice("Jeff")
-=> <Templater::DataStore:0x00007fbaa8a02188 @data=[["Jeff", 2]], @locale=:GB_en>
+template_engine.data.names.slice("Jeff")
+=> <TemplateEngine::DataStore:0x00007fbaa8a02188 @data=[["Jeff", 2]], @locale=:GB_en>
 ```
 
-Here each index row is associated with the value of the data and methods can be applied to that (defined in `lib/templater/data_store.rb`) such as `min`, `count`, `[]`, `sort` and also conditionals (such as `gt`, `lt`, `ne`, `eq`) which are able to create rich verbatims from the underlying data.
+Here each index row is associated with the value of the data and methods can be applied to that (defined in `lib/template_engine/data_store.rb`) such as `min`, `count`, `[]`, `sort` and also conditionals (such as `gt`, `lt`, `ne`, `eq`) which are able to create rich verbatims from the underlying data.
 
 #### Multiple Language Support
 
 If you notice, the key inside `text` is `GB_en` this is the default. However, other languages and keys are supported and can be used like:
 
 ```ruby
-templater = Templater::Template.create([
+template_engine = TemplateEngine::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
@@ -143,7 +143,7 @@ With this template, the results concatenate (in a top down fashion) and it resul
 You can also collect them all separately (using the method `findings`) so as to join them anyway you like:
 
 ```ruby
-Templater::Template.create([
+TemplateEngine::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
@@ -155,7 +155,7 @@ Templater::Template.create([
 #### Passing in extra Variables
 
 ```ruby
-templater = Templater::Template.create([
+template_engine = TemplateEngine::Template.create([
   { 'name' => 'Bob', 'count' => 4 },
   { 'name' => 'Alan', 'count' => 14 },
   { 'name' => 'Jeff', 'count' => 2 }
@@ -178,7 +178,7 @@ that match these other index keys":
 kpis.slice_from(names, 'Bob') # translates as select only Bob's KPIs
 ```
 
-Also see `templater_spec.rb`. Markdown can be written, returning a result such as:
+Also see `template_engine_spec.rb`. Markdown can be written, returning a result such as:
 
 Behaviour change was worst for respondents who selected:
 
@@ -187,7 +187,7 @@ Behaviour change was worst for respondents who selected:
 
 for `Would you change your response to Apple?`
 
-### Importing Google Sheets rules into Templater
+### Importing Google Sheets rules into TemplateEngine
 
 Our use-case internally was to pull in 'rules' from Google Sheets and alongside the data, display key findings. Using this library you can easily achieve this. Let's say you have wide data with many columns and you don't care about the indexes:
 
@@ -225,7 +225,7 @@ rules = [
 
 The results of which can be calculated by doing
 ``` ruby
-template = Templater.new(data, data.first.keys - ['person_id'], rules)
+template = TemplateEngine.new(data, data.first.keys - ['person_id'], rules)
 template.findings # = ['No bananas'...]
 ```
 
@@ -244,19 +244,19 @@ horrible_floats_and_time = [
 
 text = '{{round best_value }}'
 template = { 'best_value' => 'names.sort[0].value', 'text' => { 'GB_en' => text } }
-Templater::Template.create(horrible_floats_and_time, 'count', template).finding
+TemplateEngine::Template.create(horrible_floats_and_time, 'count', template).finding
 => "14.4"
 
 text = '{{month month_key }}'
 template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => text } }
-Templater::Template.create(horrible_floats_and_time, 'count', template).finding
+TemplateEngine::Template.create(horrible_floats_and_time, 'count', template).finding
 => "February"
 ```
 
 Although only those two currently come out of the box, it's easy to add more when your app initialises:
 
 ```ruby
-Templater::Template.handlebars.register_helper(:year) do |_context, condition, _block|
+TemplateEngine::Template.handlebars.register_helper(:year) do |_context, condition, _block|
   Time.at(condition).strftime('%Y')
 end
 ```
@@ -271,7 +271,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at <https://github.com/Rambatino/templater>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at <https://github.com/Rambatino/template_engine>. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -279,4 +279,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Templater project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/Rambatino/templater/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the TemplateEngine project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/Rambatino/template_engine/blob/master/CODE_OF_CONDUCT.md).
