@@ -68,8 +68,12 @@ module Teer
       @interpolate ||= proc { |string|
         begin
            @handlebars.compile(string).call(@store.to_h)
-        rescue StandardError
-          raise ArgumentError, "Could not parse variables in string: '#{string}'"
+        rescue StandardError => e
+          if e.to_s.match(/Missing helper:/)
+            raise e
+          else
+            raise ArgumentError, "Could not parse variables in string: '#{string}'"
+          end
         end
       }
     end
@@ -94,7 +98,7 @@ module Teer
         if k == 'text' && (!v.nil? && !v.empty?)
           @findings << (new_text = interpolate.call(v[@locale.to_s]))
           unparsed_new_text = v[@locale.to_s]
-        elsif v.is_a?(Hash) && eval(k, @store.instance_eval { binding })
+        elsif v.is_a?(Hash) && catch_eval(k)
           new_text = parse_template(v)
         end
         text += new_text + ' ' if new_text
@@ -102,6 +106,14 @@ module Teer
       end
       @pre_parsed_finding = CGI.unescapeHTML(pre_parsed_text[0...-1]) if !pre_parsed_text.nil? && !pre_parsed_text.empty?
       CGI.unescapeHTML(text[0...-1]) if !text.nil? && !text.empty?
+    end
+
+    def catch_eval(k)
+      begin
+        eval(k, @store.instance_eval { binding })
+      rescue
+        raise ArgumentError, "Could not parse variables in condition: '#{k}'"
+      end
     end
   end
 end

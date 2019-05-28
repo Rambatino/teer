@@ -182,7 +182,23 @@ RSpec.describe Teer do
       ]
     end
 
-    it 'handles functions within handlebars' do
+    it 'returns error if variable inside handlebars unrecognized' do
+      template = [
+        ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
+      ]
+      teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variables in string: 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'")
+    end
+
+    it 'returns error if variable in condition unrecognized' do
+      template = [
+        ['green_apple_c.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
+      ]
+      teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variables in condition: 'green_apple_c.mean > 4 && green_apple_counts.mean < 10'")
+    end
+
+    it 'returns error if hash passed as data' do
       template = [
         ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
       ]
