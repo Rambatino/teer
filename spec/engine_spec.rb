@@ -1,4 +1,4 @@
-RSpec.describe Templater::Engine do
+RSpec.describe TemplateEngine::Engine do
 
   let(:data) do
       [{ 'node_id' => 0, 'label' => Float::NAN, 'question' => Float::NAN, 'answer' => Float::NAN, 'is_terminal' => false, 'base_size' => 250.0, 'behaviour_change' => 7.244, 'overall_appeal' => 1 },

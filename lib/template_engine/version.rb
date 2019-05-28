@@ -1,3 +1,3 @@
-module Templater
+module TemplateEngine
   VERSION = "0.0.4"
 end

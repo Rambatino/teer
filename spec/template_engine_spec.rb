@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Templater do
+RSpec.describe TemplateEngine do
   it 'has a version number' do
-    expect(Templater::VERSION).not_to be nil
+    expect(TemplateEngine::VERSION).not_to be nil
   end
 
   it 'creates an empty finding when no data' do
-    expect(Templater::Template.create([], [], '')).to eq(OpenStruct.new(data: nil, finding: nil))
+    expect(TemplateEngine::Template.create([], [], '')).to eq(OpenStruct.new(data: nil, finding: nil))
   end
 
   context 'when looking at apples data' do
@@ -19,18 +19,18 @@ RSpec.describe Templater do
           'GB_en' => '{{ best_name }} collected {{ best_value }} apples, higher than anyone else!'
         }
       }
-      templater = Templater::Template.create(apples, 'count', template)
-      expect(templater.finding).to eq('Alan collected 14 apples, higher than anyone else!')
+      template_engine = TemplateEngine::Template.create(apples, 'count', template)
+      expect(template_engine.finding).to eq('Alan collected 14 apples, higher than anyone else!')
     end
 
     it 'can handle yaml' do
-      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'))
-      expect(templater.finding).to eq('Jeff has the least apples, having only 2')
+      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'))
+      expect(template_engine.finding).to eq('Jeff has the least apples, having only 2')
     end
 
     it 'can handle more complex yaml' do
-      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(templater.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
+      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(template_engine.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
 
     it 'can pass other parameters through' do
@@ -41,23 +41,23 @@ RSpec.describe Templater do
           'GB_en' => '{{ cat }} apples!'
         }
       }
-      templater = Templater::Template.create(apples, 'count', template, 'cat' => 'meow')
-      expect(templater.finding).to eq('meow apples!')
+      template_engine = TemplateEngine::Template.create(apples, 'count', template, 'cat' => 'meow')
+      expect(template_engine.finding).to eq('meow apples!')
     end
 
     it 'can handle another language, such as French' do
-      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
-      expect(templater.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
+      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
+      expect(template_engine.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
     end
 
     it 'allows conditionals' do
-      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(templater.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
+      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(template_engine.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
 
     it 'can collect all statements' do
-      templater = Templater::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(templater.findings).to eq(['Alan has the most apples.', "It's a lot more than Bob who came in second place."])
+      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(template_engine.findings).to eq(['Alan has the most apples.', "It's a lot more than Bob who came in second place."])
     end
 
     it 'can slice a specific person' do
@@ -67,8 +67,8 @@ RSpec.describe Templater do
           'GB_en' => 'Bob has {{ count }} apples!'
         }
       }
-      templater = Templater::Template.create(apples, 'count', template, 'cat' => 'meow')
-      expect(templater.finding).to eq('Bob has 4 apples!')
+      template_engine = TemplateEngine::Template.create(apples, 'count', template, 'cat' => 'meow')
+      expect(template_engine.finding).to eq('Bob has 4 apples!')
     end
   end
 
@@ -91,8 +91,8 @@ RSpec.describe Templater do
         ['red_apple_counts.mean > 9', 'Lots of red apples have been found'],
         ['red_apple_count.names.slice("Bob").value > 5', 'Bob has made his quota']
       ]
-      templater = Templater::Template.create(apples, %w[green_apple_count red_apple_count], template)
-      expect(templater.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found', 'Bob has made his quota'])
+      template_engine = TemplateEngine::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect(template_engine.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found', 'Bob has made his quota'])
     end
 
     let(:apples_bad_name) do
@@ -104,11 +104,11 @@ RSpec.describe Templater do
     end
 
     it 'raises error if column name is plural' do
-      expect { Templater::Template.create(apples, %w[green_apples red_apples], [[]]) }.to raise_error
+      expect { TemplateEngine::Template.create(apples, %w[green_apples red_apples], [[]]) }.to raise_error
     end
 
     it 'columns do not exist' do
-      expect { Templater::Template.create(apples, %w[green_apple red_apple_count], [[]]) }.to raise_error
+      expect { TemplateEngine::Template.create(apples, %w[green_apple red_apple_count], [[]]) }.to raise_error
     end
   end
 
@@ -125,13 +125,13 @@ RSpec.describe Templater do
         { 'node_id' => 4, 'label' => 'region', 'question' => 'regUS', 'answer' => 'West', 'is_terminal' => true, 'base_size' => 33.0, 'behaviour_change' => 6.879 },
         { 'node_id' => 4, 'label' => 'gender', 'question' => 'gender', 'answer' => 'Female', 'is_terminal' => true, 'base_size' => 33.0, 'behaviour_change' => 6.879 }
       ]
-      templater = Templater::Template.create(
+      template_engine = TemplateEngine::Template.create(
         tree_data,
         'behaviour_change',
         File.join(File.dirname(__FILE__), './tree.yml'),
         'NAME' => 'Would you change your response to Apple?'
       )
-      expect(templater.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
+      expect(template_engine.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
     end
   end
 
@@ -146,30 +146,30 @@ RSpec.describe Templater do
 
     it 'can use default handler :round' do
       template = { 'best_value' => 'names.sort[0].value', 'text' => { 'GB_en' => '{{round best_value }}' } }
-      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
-      expect(templater.finding).to eq('14.4')
+      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
+      expect(template_engine.finding).to eq('14.4')
     end
 
     it 'can use default handler :month' do
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{month month_key }}' } }
-      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
-      expect(templater.finding).to eq('February')
+      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
+      expect(template_engine.finding).to eq('February')
     end
 
     it 'raises ledgeable error when helper does not exist' do
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
-      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
-      expect { templater.finding }.to raise_error(/Missing helper: "year"/)
+      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
+      expect { template_engine.finding }.to raise_error(/Missing helper: "year"/)
     end
 
     it 'can have extra handlers added' do
-      Templater::Template.handlebars.register_helper(:year) do |_context, condition, _block|
+      TemplateEngine::Template.handlebars.register_helper(:year) do |_context, condition, _block|
         Time.at(condition).strftime('%Y')
       end
 
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
-      templater = Templater::Template.create(horrible_floats_and_time, 'count', template)
-      expect(templater.finding).to eq('1993')
+      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
+      expect(template_engine.finding).to eq('1993')
     end
   end
 end

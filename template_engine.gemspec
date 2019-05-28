@@ -1,17 +1,17 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'templater/version'
+require 'template_engine/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'templater'
-  spec.version       = Templater::VERSION
+  spec.name          = 'template_engine'
+  spec.version       = TemplateEngine::VERSION
   spec.authors       = ['Mark Ramotowski']
   spec.email         = ['mark.tint.ramotowski@gmail.com']
 
   spec.summary       = 'Create human readable summation of data'
   spec.description   = 'Turns data into human readable format using templates with simple logic statements'
-  spec.homepage      = 'https://www.github.com/Rambatino/templater'
+  spec.homepage      = 'https://www.github.com/Rambatino/template_engine'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
