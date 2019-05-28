@@ -225,7 +225,7 @@ rules = [
 
 The results of which can be calculated by doing
 ``` ruby
-template = TemplateEngine.new(data, data.first.keys - ['person_id'], rules)
+template = TemplateEngine::Template.create(data, data.first.keys - ['person_id'], rules)
 template.findings # = ['No bananas'...]
 ```
 
