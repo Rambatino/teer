@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'active_support/inflector'
-require 'template_engine/data_store'
-require 'template_engine/vector_store'
+require 'teer/data_store'
+require 'teer/vector_store'
 require 'ostruct'
 
-module TemplateEngine
+module Teer
   class Engine
     def initialize(data, names, template, handlebars, locale, kwargs)
       @template = template

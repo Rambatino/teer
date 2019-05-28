@@ -1,6 +1,6 @@
 require_relative 'vector_store'
 
-module TemplateEngine
+module Teer
   class DataStore
     def initialize(data, locale)
       @data = data

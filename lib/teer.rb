@@ -1,9 +1,9 @@
-require 'template_engine/version'
-require 'template_engine/engine'
+require 'teer/version'
+require 'teer/engine'
 require 'handlebars'
 require 'yaml'
 
-module TemplateEngine
+module Teer
   class Error < StandardError; end
 
   class Template

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe TemplateEngine do
+RSpec.describe Teer do
   it 'has a version number' do
-    expect(TemplateEngine::VERSION).not_to be nil
+    expect(Teer::VERSION).not_to be nil
   end
 
   it 'creates an empty finding when no data' do
-    expect(TemplateEngine::Template.create([], [], '')).to eq(OpenStruct.new(data: nil, finding: nil))
+    expect(Teer::Template.create([], [], '')).to eq(OpenStruct.new(data: nil, finding: nil))
   end
 
   context 'when looking at apples data' do
@@ -19,18 +19,18 @@ RSpec.describe TemplateEngine do
           'GB_en' => '{{ best_name }} collected {{ best_value }} apples, higher than anyone else!'
         }
       }
-      template_engine = TemplateEngine::Template.create(apples, 'count', template)
-      expect(template_engine.finding).to eq('Alan collected 14 apples, higher than anyone else!')
+      teer = Teer::Template.create(apples, 'count', template)
+      expect(teer.finding).to eq('Alan collected 14 apples, higher than anyone else!')
     end
 
     it 'can handle yaml' do
-      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'))
-      expect(template_engine.finding).to eq('Jeff has the least apples, having only 2')
+      teer = Teer::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'))
+      expect(teer.finding).to eq('Jeff has the least apples, having only 2')
     end
 
     it 'can handle more complex yaml' do
-      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(template_engine.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
+      teer = Teer::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(teer.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
 
     it 'can pass other parameters through' do
@@ -41,23 +41,23 @@ RSpec.describe TemplateEngine do
           'GB_en' => '{{ cat }} apples!'
         }
       }
-      template_engine = TemplateEngine::Template.create(apples, 'count', template, 'cat' => 'meow')
-      expect(template_engine.finding).to eq('meow apples!')
+      teer = Teer::Template.create(apples, 'count', template, 'cat' => 'meow')
+      expect(teer.finding).to eq('meow apples!')
     end
 
     it 'can handle another language, such as French' do
-      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
-      expect(template_engine.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
+      teer = Teer::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples.yml'), {}, :FR)
+      expect(teer.finding).to eq("Jeff a le moins de pommes, n'en ayant que 2")
     end
 
     it 'allows conditionals' do
-      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(template_engine.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
+      teer = Teer::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(teer.finding).to eq("Alan has the most apples. It's a lot more than Bob who came in second place.")
     end
 
     it 'can collect all statements' do
-      template_engine = TemplateEngine::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
-      expect(template_engine.findings).to eq(['Alan has the most apples.', "It's a lot more than Bob who came in second place."])
+      teer = Teer::Template.create(apples, 'count', File.join(File.dirname(__FILE__), './apples_with_conditionals.yml'))
+      expect(teer.findings).to eq(['Alan has the most apples.', "It's a lot more than Bob who came in second place."])
     end
 
     it 'can slice a specific person' do
@@ -67,8 +67,8 @@ RSpec.describe TemplateEngine do
           'GB_en' => 'Bob has {{ count }} apples!'
         }
       }
-      template_engine = TemplateEngine::Template.create(apples, 'count', template, 'cat' => 'meow')
-      expect(template_engine.finding).to eq('Bob has 4 apples!')
+      teer = Teer::Template.create(apples, 'count', template, 'cat' => 'meow')
+      expect(teer.finding).to eq('Bob has 4 apples!')
     end
   end
 
@@ -91,8 +91,8 @@ RSpec.describe TemplateEngine do
         ['red_apple_counts.mean > 9', 'Lots of red apples have been found'],
         ['red_apple_count.names.slice("Bob").value > 5', 'Bob has made his quota']
       ]
-      template_engine = TemplateEngine::Template.create(apples, %w[green_apple_count red_apple_count], template)
-      expect(template_engine.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found', 'Bob has made his quota'])
+      teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
+      expect(teer.findings).to eq(['A decent amount of green apples have been found', 'Lots of red apples have been found', 'Bob has made his quota'])
     end
 
     let(:apples_bad_name) do
@@ -104,11 +104,11 @@ RSpec.describe TemplateEngine do
     end
 
     it 'raises error if column name is plural' do
-      expect { TemplateEngine::Template.create(apples, %w[green_apples red_apples], [[]]) }.to raise_error
+      expect { Teer::Template.create(apples, %w[green_apples red_apples], [[]]) }.to raise_error
     end
 
     it 'columns do not exist' do
-      expect { TemplateEngine::Template.create(apples, %w[green_apple red_apple_count], [[]]) }.to raise_error
+      expect { Teer::Template.create(apples, %w[green_apple red_apple_count], [[]]) }.to raise_error
     end
   end
 
@@ -125,13 +125,13 @@ RSpec.describe TemplateEngine do
         { 'node_id' => 4, 'label' => 'region', 'question' => 'regUS', 'answer' => 'West', 'is_terminal' => true, 'base_size' => 33.0, 'behaviour_change' => 6.879 },
         { 'node_id' => 4, 'label' => 'gender', 'question' => 'gender', 'answer' => 'Female', 'is_terminal' => true, 'base_size' => 33.0, 'behaviour_change' => 6.879 }
       ]
-      template_engine = TemplateEngine::Template.create(
+      teer = Teer::Template.create(
         tree_data,
         'behaviour_change',
         File.join(File.dirname(__FILE__), './tree.yml'),
         'NAME' => 'Would you change your response to Apple?'
       )
-      expect(template_engine.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
+      expect(teer.finding).to eq("Behaviour change was worst for respondents who selected: \n* `West` for `regUS`\n* `Female` for `gender`\n\nfor `Would you change your response to Apple?`")
     end
   end
 
@@ -146,30 +146,30 @@ RSpec.describe TemplateEngine do
 
     it 'can use default handler :round' do
       template = { 'best_value' => 'names.sort[0].value', 'text' => { 'GB_en' => '{{round best_value }}' } }
-      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
-      expect(template_engine.finding).to eq('14.4')
+      teer = Teer::Template.create(horrible_floats_and_time, 'count', template)
+      expect(teer.finding).to eq('14.4')
     end
 
     it 'can use default handler :month' do
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{month month_key }}' } }
-      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
-      expect(template_engine.finding).to eq('February')
+      teer = Teer::Template.create(horrible_floats_and_time, 'count', template)
+      expect(teer.finding).to eq('February')
     end
 
     it 'raises ledgeable error when helper does not exist' do
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
-      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
-      expect { template_engine.finding }.to raise_error(/Missing helper: "year"/)
+      teer = Teer::Template.create(horrible_floats_and_time, 'count', template)
+      expect { teer.finding }.to raise_error(/Missing helper: "year"/)
     end
 
     it 'can have extra handlers added' do
-      TemplateEngine::Template.handlebars.register_helper(:year) do |_context, condition, _block|
+      Teer::Template.handlebars.register_helper(:year) do |_context, condition, _block|
         Time.at(condition).strftime('%Y')
       end
 
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
-      template_engine = TemplateEngine::Template.create(horrible_floats_and_time, 'count', template)
-      expect(template_engine.finding).to eq('1993')
+      teer = Teer::Template.create(horrible_floats_and_time, 'count', template)
+      expect(teer.finding).to eq('1993')
     end
   end
 end

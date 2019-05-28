@@ -1,4 +1,4 @@
-module TemplateEngine
+module Teer
   class VectorStore
     def initialize(data, locale)
       @data = data

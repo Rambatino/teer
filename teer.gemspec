@@ -1,17 +1,17 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'template_engine/version'
+require 'teer/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'template_engine'
-  spec.version       = TemplateEngine::VERSION
+  spec.name          = 'teer'
+  spec.version       = Teer::VERSION
   spec.authors       = ['Mark Ramotowski']
   spec.email         = ['mark.tint.ramotowski@gmail.com']
 
   spec.summary       = 'Create human readable summation of data'
   spec.description   = 'Turns data into human readable format using templates with simple logic statements'
-  spec.homepage      = 'https://www.github.com/Rambatino/template_engine'
+  spec.homepage      = 'https://www.github.com/Rambatino/teer'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
