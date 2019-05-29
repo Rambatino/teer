@@ -7,9 +7,9 @@ require 'ostruct'
 
 module Teer
   class Engine
-    def initialize(data, names, template, handlebars, locale, kwargs)
+    def initialize(data, names, template, parser, locale, kwargs)
       @template = template
-      @handlebars = handlebars
+      @parser = parser
       @locale = locale
       @findings = []
       setup_store(data, names)
@@ -65,17 +65,7 @@ module Teer
     end
 
     def interpolate
-      @interpolate ||= proc { |string|
-        begin
-           @handlebars.compile(string).call(@store.to_h)
-        rescue StandardError => e
-          if e.to_s.match(/Missing helper:/)
-            raise e
-          else
-            raise ArgumentError, "Could not parse variables in string: '#{string}'"
-          end
-        end
-      }
+      @interpolate ||= proc { |string| @parser.render(string, @store.to_h) }
     end
 
     def add_to_store(template)
@@ -104,8 +94,14 @@ module Teer
         text += new_text + ' ' if new_text
         pre_parsed_text += unparsed_new_text + ' ' if unparsed_new_text
       end
-      @pre_parsed_finding = CGI.unescapeHTML(pre_parsed_text[0...-1]) if !pre_parsed_text.nil? && !pre_parsed_text.empty?
+      update_preparsed_finding(pre_parsed_text)
       CGI.unescapeHTML(text[0...-1]) if !text.nil? && !text.empty?
+    end
+
+    def update_preparsed_finding(text)
+      if !text.nil? && !text.empty?
+        @pre_parsed_finding = CGI.unescapeHTML(text[0...-1])
+      end
     end
 
     def catch_eval(k)

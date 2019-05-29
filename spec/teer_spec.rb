@@ -159,12 +159,12 @@ RSpec.describe Teer do
     it 'raises ledgeable error when helper does not exist' do
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
       teer = Teer::Template.create(horrible_floats_and_time, 'count', template)
-      expect { teer.finding }.to raise_error(/Missing helper: "year"/)
+      expect { teer.finding }.to raise_error(/Missing helper: 'year'/)
     end
 
     it 'can have extra handlers added' do
-      Teer::Template.handlebars.register_helper(:year) do |_context, condition, _block|
-        Time.at(condition).strftime('%Y')
+      Teer::Template.parser.register_helper(:year) do |ctx, value|
+        Time.at(value).strftime('%Y')
       end
 
       template = { 'month_key' => 'times.sort[0].key', 'text' => { 'GB_en' => '{{year month_key }}' } }
@@ -187,7 +187,7 @@ RSpec.describe Teer do
         ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
       ]
       teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
-      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variables in string: 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'")
+      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variable: 'green_apple_count.mean'")
     end
 
     it 'returns error if variable in condition unrecognized' do
@@ -203,7 +203,7 @@ RSpec.describe Teer do
         ['green_apple_counts.mean > 4 && green_apple_counts.mean < 10', 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'],
       ]
       teer = Teer::Template.create(apples, %w[green_apple_count red_apple_count], template)
-      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variables in string: 'A decent amount of green apples have been found equal to {{round green_apple_count.mean }}'")
+      expect { teer.finding }.to raise_error(ArgumentError, "Could not parse variable: 'green_apple_count.mean'")
     end
   end
 end

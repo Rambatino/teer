@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Teer
   class VectorStore
     def initialize(data, locale)

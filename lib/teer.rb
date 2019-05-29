@@ -1,6 +1,6 @@
 require 'teer/version'
 require 'teer/engine'
-require 'handlebars'
+require 'teer/parser'
 require 'yaml'
 
 module Teer
@@ -12,7 +12,7 @@ module Teer
       register_helpers
       data_keys = data.first.keys
       raise ArgumentError, "#{names} not present in data" if (Array(names) - data_keys).count != 0
-      @template = Engine.new(data, names, template(rules_path_or_obj, locale), handlebars, locale, kwargs)
+      @template = Engine.new(data, names, template(rules_path_or_obj, locale), parser, locale, kwargs)
     end
 
     def pre_parsed_finding
@@ -32,16 +32,16 @@ module Teer
       end
     end
 
-    def self.handlebars
-      @handlebars ||= Handlebars::Context.new
+    def self.parser
+      @parser ||= Parser.new
     end
 
     def self.register_helpers
-      handlebars.register_helper(:round) do |_context, condition, _block|
-        condition < 1 ? condition.round(2) : condition.round(1)
+      parser.register_helper(:round) do |ctx, value|
+        value < 1 ? value.round(2) : value.round(1)
       end
-      handlebars.register_helper(:month) do |_context, condition, _block|
-        Time.at(condition).strftime('%B')
+      parser.register_helper(:month) do |ctx, value|
+        Time.at(value).strftime('%B')
       end
     end
   end

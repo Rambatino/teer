@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'vector_store'
 
 module Teer
